@@ -21,7 +21,7 @@ export default function RegisterPage({navigation}){
             
             <TextInput style={styles.textInput}
             placeholder="Firstname"
-            value={formData.first_name}
+            value={formData.first_name}                                                                                                                                 
             onChangeText={(text) => handleChange('first_name', text)}
             />
             <TextInput style={styles.textInput}
