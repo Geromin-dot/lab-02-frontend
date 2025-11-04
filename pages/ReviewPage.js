@@ -1,5 +1,5 @@
 import { View, Text, Button } from "react-native";
-import styles from "../style";
+import styles from '../style';
 import axios from "axios";
 
 export default function ReviewPage({ route, navigation }) {

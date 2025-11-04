@@ -1,16 +1,18 @@
-import { View, Text, Button, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, Button, ActivityIndicator, FlatList, Alert } from 'react-native';
 import axios from 'axios';
-import { useState, useEffect } from 'react';
 import * as React from 'react';
-import styles  from '../style'; 
+import { useState, useEffect } from 'react';
+import styles from '../style';
 
 export default function UserListPage() {
     const [users, setUsers] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
+    const BASE_URL = 'http://192.168.30.108:8000/registration/api/users/';
 
-    useEffect(() => {
+    const fetchUsers = () => {
+        setLoading(true);
         axios
-            .get('http://192.168.30.108:8000/registration/api/users/')
+            .get(BASE_URL)
             .then((res) => {
                 setUsers(res.data);
                 setLoading(false);
@@ -19,7 +21,36 @@ export default function UserListPage() {
                 console.error(error);
                 setLoading(false);
             });
+    }
+
+    React.useEffect(() => {
+        fetchUsers();
     }, []);
+
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Confirm Delete",
+            "Are you sure you want to delete this user?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => {
+                        axios
+                            .delete(`http://192.168.30.108:8000/registration/api/users/${id}/`)
+                            .then(() => {
+                                Alert.alert("Success", "User deleted successfully");
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                                Alert.alert("Error", "Failed to delete user");
+                            });
+                    },
+                },
+            ]
+        );
+    };
 
     if (loading) {
         return (
@@ -42,17 +73,17 @@ export default function UserListPage() {
                         <Text>{item.email}</Text>
                         <Text>{item.gender}</Text>
                         <Button
-                        title="Edit"
-                        color={"#2fb846ff"}/>
+                            title="Edit"
+                            color={"#2fb846ff"}
+                        />
                         <Button
-                        title="Delete"
-                        color={"#ff3b3bff"}/>
+                            title="Delete"
+                            color={"#ff3b3bff"}
+                            onPress={() => handleDelete(item.id)}
+                        />
                     </View>
                 )}
             />
         </View>
     );
 }
-
-
-

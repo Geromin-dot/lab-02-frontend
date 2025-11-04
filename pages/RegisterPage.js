@@ -1,5 +1,5 @@
 import { View, Text, Button, TextInput } from "react-native";
-import styles from "../style";
+import styles from '../style';
 import React, {useState} from "react";
 
 export default function RegisterPage({navigation}){
