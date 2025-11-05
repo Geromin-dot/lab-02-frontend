@@ -1,85 +1,85 @@
-import { View, Text, Button, ActivityIndicator, FlatList, Alert } from 'react-native';
+import {View, Text, Button, ActivityIndicator, FlatList, Alert} from 'react-native';
 import axios from 'axios';
-import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useEffect } from 'react/cjs/react.development';
 import styles from '../style';
 
-export default function UserListPage() {
-    const [users, setUsers] = React.useState([]);
-    const [loading, setLoading] = React.useState(true);
-    const BASE_URL = 'http://192.168.30.108:8000/registration/api/users/';
+export default function UserListPage({navigation}){
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const fetchUsers = () => {
-        setLoading(true);
-        axios
-            .get(BASE_URL)
-            .then((res) => {
-                setUsers(res.data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error(error);
-                setLoading(false);
-            });
-    }
-
-    React.useEffect(() => {
-        fetchUsers();
+    useEffect(() => {
+        axios.get("http://192.168.30.108:8080/registration/api/users/")
+        .then((res) => {
+            setUsers(res.data);
+            setLoading(false);
+        })
+        .catch((error) => {
+            console.error(err);
+            setLoading(false);
+        })
     }, []);
+
+    if (loading) {
+        return (
+            <View>
+                <ActivityIndicator size="large" color="#2b17a5" />
+                <Text>Loading Users...</Text>
+            </View>
+        );
+    }
 
     const handleDelete = (id) => {
         Alert.alert(
             "Confirm Delete",
-            "Are you sure you want to delete this user?",
+            "Are you sure you want to Delete this user?",
             [
-                { text: "Cancel", style: "cancel" },
+                {text: "Cancel", style: "cancel"},
                 {
                     text: "Delete",
                     style: "destructive",
                     onPress: () => {
                         axios
-                            .delete(`http://192.168.30.108:8000/registration/api/users/${id}/`)
-                            .then(() => {
-                                Alert.alert("Success", "User deleted successfully");
-                            })
-                            .catch((err) => {
-                                console.error(err);
-                                Alert.alert("Error", "Failed to delete user");
-                            });
+                        .delete(`http://192.168.30.108:8080/registration/api/users/${id}/`)
+                        .then(() => {
+                            Alert.alert("Success", "User deleted successfully");
+                        })
+                        .catch((err)=>{
+                            console.error(err);
+                            Alert.alert("Error", "Failed to delete user");
+                        });
                     },
                 },
             ]
-        );
+        );  
     };
-
-    if (loading) {
-        return (
-            <View>
-                <ActivityIndicator screenReaderFocusable={true} size="large" color="#0000ff" />
-                <Text>Loading...</Text>
-            </View>
-        );
+    
+    const handleEdit = (user) =>{
+        navigation.navigate("EditUser", {user});
     }
 
-    return (
+    return(
         <View>
-            <Text style={styles.title}>View All Users</Text>
-            <FlatList style={styles.table}
+            <Text style={styles.title}>User List Page</Text>
+            <FlatList
                 data={users}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.users}>
-                        <Text>{item.last_name} {item.first_name}</Text>
-                        <Text>{item.email}</Text>
-                        <Text>{item.gender}</Text>
+                renderItem={({item}) => (
+                    <View style={styles.userContainer}>
+                        <Text>{item.first_name} {item.last_name}</Text>
+                        <Text>Email: {item.email}</Text>
+                        <Text>Gender: {item.gender}</Text>
+
                         <Button
-                            title="Edit"
-                            color={"#2fb846ff"}
+                        title="Edit"
+                        color="#40d32dff"
+                        onPress={()=> handleEdit(item)}
                         />
+
                         <Button
-                            title="Delete"
-                            color={"#ff3b3bff"}
-                            onPress={() => handleDelete(item.id)}
+                        title="Delete"
+                        color="#ff3b30"
+                        onPress={()=> handleDelete(item.id)}
                         />
                     </View>
                 )}
